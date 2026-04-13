@@ -1,0 +1,23 @@
+{
+  "skill_name": "aliyun-billing-check",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我看看阿里云最近的消费情况",
+      "expected_output": "输出前14个月的消费汇总表格，包含总计、预付费、后付费",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我想查询一下阿里云过去一年的账单情况",
+      "expected_output": "输出消费汇总表格",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "阿里云的预付费和后付费各花了多少钱",
+      "expected_output": "输出包含预付费和后付费的汇总表格",
+      "files": []
+    }
+  ]
+}

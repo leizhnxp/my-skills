@@ -1,0 +1,23 @@
+{
+  "skill_name": "aliyun-clb-acl-manager",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我把当前IP加到阿里云白名单",
+      "expected_output": "交互式询问工具选择，获取身份和IP，添加到指定ACL，显示前后对比",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "需要将我的IP添加到阿里云白名单中，我想使用aliyun cli",
+      "expected_output": "使用aliyun cli执行操作，检查工具可用性，完成IP添加",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "请把我现在的IP地址加入阿里云白名单，用MCP工具",
+      "expected_output": "使用MCP工具执行操作，如果MCP不可用提供安装指导",
+      "files": []
+    }
+  ]
+}
