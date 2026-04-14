@@ -41,15 +41,20 @@ def get_bill_overview(billing_cycle, profile=None):
     return run_aliyun_command(cmd, profile)
 
 
-def get_instance_bill_items(billing_cycle, profile=None):
-    """获取指定月份的所有实例账单（处理分页）"""
+def get_instance_bill_items(billing_cycle, profile=None, max_pages=100):
+    """获取指定月份的所有实例账单（处理分页）
+
+    Args:
+        billing_cycle: 账期月份，格式 YYYY-MM
+        profile: 阿里云CLI配置 profile 名称
+        max_pages: 最大分页数（安全上限，防止死循环），默认100页（约30000条）
+    """
     all_items = []
     next_token = ''
     max_results = 300
-    max_pages = 5  # 限制最多查询5页，避免太慢
-
     page_count = 0
-    while page_count < max_pages:
+
+    while True:
         cmd = f"aliyun bssopenapi DescribeInstanceBill --BillingCycle {billing_cycle} --MaxResults {max_results}"
         if next_token:
             cmd += f" --NextToken '{next_token}'"
@@ -63,12 +68,15 @@ def get_instance_bill_items(billing_cycle, profile=None):
             break
 
         all_items.extend(items)
+        page_count += 1
 
         next_token = data['Data'].get('NextToken', '')
         if not next_token:
             break
 
-        page_count += 1
+        if page_count >= max_pages:
+            print(f"警告：{billing_cycle} 的实例账单分页数已达上限({max_pages}页，共{len(all_items)}条)，可能存在未获取的数据。可通过 --max-pages 参数调整上限。", file=sys.stderr)
+            break
 
     return all_items
 
@@ -240,6 +248,7 @@ def main():
     parser.add_argument('--profile', help='阿里云CLI配置 profile 名称')
     parser.add_argument('--months', type=int, help='查询最近N个月的数据（不含当月）')
     parser.add_argument('--month', help='查询指定月份（格式：YYYY-MM）')
+    parser.add_argument('--max-pages', type=int, default=100, help='最大分页数（安全上限，默认100页约30000条）')
     parser.add_argument('--output', '-o', help='输出结果到文件')
     args = parser.parse_args()
 
@@ -266,7 +275,7 @@ def main():
     for month in months:
         print(f"正在查询 {month} 的账单...", file=sys.stderr)
         overview = get_bill_overview(month, args.profile)
-        instance_items = get_instance_bill_items(month, args.profile)
+        instance_items = get_instance_bill_items(month, args.profile, args.max_pages)
 
         if overview:
             data = parse_bill_data(overview, instance_items)
